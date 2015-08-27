@@ -183,6 +183,26 @@ FUNCTION {emphasize}
     { "{\em " swap$ * "}" * }
   if$
 }
+
+FUNCTION {bibinfo.check}
+{ swap$
+  duplicate$ missing$
+    {
+      pop$ pop$
+      ""
+    }
+    { duplicate$ empty$
+        {
+          swap$ pop$
+        }
+        { swap$
+          pop$
+        }
+      if$
+    }
+  if$
+}
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%% IPMB-Style (make year bold)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -286,7 +306,7 @@ FUNCTION {format.date}
     }
     { month empty$
         'year
-        { month " " * year * }
+        'year %{ month " " * year * }
       if$
     }
   if$
@@ -582,13 +602,14 @@ FUNCTION {book}
     }
   if$
   new.block
-  format.btitle "title" output.check
   crossref missing$
-    { format.bvolume output
+    { format.date boldYear "year" output.check
+      format.btitle "title" output.check
+      format.bvolume output
       new.block
       format.number.series output
       new.sentence
-      publisher "publisher" output.check
+      publisher emphasize "publisher" output.check
       address output
     }
     { new.block
@@ -596,7 +617,6 @@ FUNCTION {book}
     }
   if$
   format.edition output
-  format.date "year" output.check
   new.block
   note output
   fin.entry
@@ -680,6 +700,8 @@ FUNCTION {inproceedings}
 { output.bibitem
   format.authors "author" output.check
   new.block
+  format.date boldYear "year" output.check
+  new.block
   format.title "title" output.check
   new.block
   crossref missing$
@@ -691,10 +713,10 @@ FUNCTION {inproceedings}
         { organization publisher new.sentence.checkb
           organization output
           publisher output
-          format.date "year" output.check
+          %format.date "year" output.check
         }
         { address output.nonnull
-          format.date "year" output.check
+          %format.date "year" output.check
           new.sentence
           organization output
           publisher output
@@ -761,30 +783,51 @@ FUNCTION {mastersthesis}
   fin.entry
 }
 
+
 FUNCTION {misc}
 { output.bibitem
   format.authors output
+  %add.colon
   title howpublished new.block.checkb
   format.title output
   howpublished new.block.checka
-  howpublished output
+  howpublished "howpublished" bibinfo.check output
   format.date output
-  new.block
+  %new.block
+  %format.url output
+  %new.block
+  %format.note output
   note output
   fin.entry
   empty.misc.check
 }
 
-FUNCTION {phdthesis}
+%%%%%%%%%%% OLD %%%%%%%%%%%%%%%%%%%%
+% FUNCTION {misc}
+% { output.bibitem
+%   format.authors output
+%   title howpublished new.block.checkb
+%   format.title output
+%   howpublished new.block.checka
+%   howpublished output
+%   format.date output
+%   new.block
+%   note output
+%   fin.entry
+%   empty.misc.check
+% }
+
+Function {phdthesis}
 { output.bibitem
   format.authors "author" output.check
+  new.block
+  format.date boldYear "year" output.check
   new.block
   format.btitle "title" output.check
   new.block
   "PhD thesis" format.thesis.type output.nonnull
   school "school" output.check
   address output
-  format.date "year" output.check
   new.block
   note output
   fin.entry
